@@ -1,0 +1,23 @@
+# Terraform Variables Configuration
+# Copy this file to terraform.tfvars and customize as needed
+
+# AWS Configuration
+aws_region = "us-east-1"
+
+# Project naming
+project_name = "flask-express-single"
+
+# Network Configuration
+vpc_cidr           = "10.0.0.0/16"
+public_subnet_cidr = "10.0.1.0/24"
+
+# EC2 Configuration
+# For Ubuntu 22.04 LTS, find the latest AMI ID from:
+# https://cloud-images.ubuntu.com/locator/ec2/
+ami_id        = "ami-0c7217cdde317cfec"  # Ubuntu 22.04 LTS in us-east-1
+instance_type = "t2.medium"
+
+# SSH Key Configuration
+# Generate a key pair if you don't have one:
+# ssh-keygen -t rsa -b 4096 -f ~/.ssh/terraform-key
+public_key_path = "~/.ssh/id_rsa.pub"

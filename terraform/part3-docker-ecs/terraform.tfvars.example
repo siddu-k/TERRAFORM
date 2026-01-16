@@ -1,0 +1,23 @@
+# Terraform Variables Configuration
+# Copy this file to terraform.tfvars and customize as needed
+
+aws_region   = "us-east-1"
+project_name = "flask-express-ecs"
+
+# Network Configuration
+vpc_cidr              = "10.0.0.0/16"
+public_subnet_1_cidr  = "10.0.1.0/24"
+public_subnet_2_cidr  = "10.0.2.0/24"
+private_subnet_1_cidr = "10.0.11.0/24"
+private_subnet_2_cidr = "10.0.12.0/24"
+
+# ECS Task Configuration
+backend_cpu    = "256"   # 0.25 vCPU
+backend_memory = "512"   # 512 MB
+
+frontend_cpu    = "256"
+frontend_memory = "512"
+
+# Scaling Configuration
+backend_desired_count  = 2
+frontend_desired_count = 2
