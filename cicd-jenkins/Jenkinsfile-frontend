@@ -1,0 +1,91 @@
+pipeline {
+    agent any
+    
+    environment {
+        APP_DIR = '/var/www/express-app'
+        REPO_URL = 'https://github.com/siddu-k/Docker_compose_assignment.git'
+        BACKEND_URL = 'http://localhost:8000/api'
+    }
+    
+    stages {
+        stage('Cleanup') {
+            steps {
+                sh 'rm -rf frontend-temp'
+            }
+        }
+        
+        stage('Checkout') {
+            steps {
+                sh 'git clone ${REPO_URL} frontend-temp'
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                    cd frontend-temp/frontend
+                    npm install
+                '''
+            }
+        }
+        
+        stage('Copy Files') {
+            steps {
+                sh '''
+                    sudo cp -r frontend-temp/frontend/* ${APP_DIR}/
+                    sudo chown -R jenkins:jenkins ${APP_DIR}
+                '''
+            }
+        }
+        
+        stage('Configure Service') {
+            steps {
+                sh '''
+                    sudo tee /etc/systemd/system/express-frontend.service > /dev/null <<EOF
+[Unit]
+Description=Express Frontend
+After=network.target flask-backend.service
+
+[Service]
+Type=simple
+User=jenkins
+WorkingDirectory=${APP_DIR}
+Environment="BACKEND_URL=${BACKEND_URL}"
+ExecStart=/usr/bin/npm start
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+                '''
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                sh '''
+                    sudo systemctl daemon-reload
+                    sudo systemctl enable express-frontend
+                    sudo systemctl restart express-frontend
+                    sleep 5
+                    sudo systemctl status express-frontend
+                '''
+            }
+        }
+        
+        stage('Cleanup Temp') {
+            steps {
+                sh 'rm -rf frontend-temp'
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Express frontend deployed successfully'
+        }
+        failure {
+            echo 'Deployment failed'
+        }
+    }
+}
